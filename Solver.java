@@ -6,16 +6,22 @@ public class Solver {
 		Board board;
 		SearchNode previous;
 		int moves;
+		int priority;
 
 		public SearchNode(Board board, SearchNode previous) {
 			this.previous = previous;
 			this.board = board;
 			moves = 0;
 			minmoves = 0;
+			priority = 0;
 		}
 
 		public int getPriority(){
-			return board.manhattan() + moves;
+			return priority;
+		}
+
+		public void updatePriority(){
+			priority = board.manhattan() + moves;
 		}
 
 		@Override
@@ -50,10 +56,13 @@ public class Solver {
     		min = nodes.delMin();
     		Iterable<Board> neighbours = min.board.neighbors();
     		for (Board item : neighbours)
-    			if (item != null && !item.equals(min.previous.board)){
-    				SearchNode t = new SearchNode(item, min);
-    				t.moves = min.moves + 1;
-    				nodes.insert(t);
+    			if (item != null){
+    				if (!item.isEqual(min.previous.board)){
+	    				SearchNode t = new SearchNode(item, min);
+	    				t.moves = min.moves + 1;
+	    				t.updatePriority();
+	    				nodes.insert(t);
+    				}
     			}
     	}
     	setMinMoves(min.moves);

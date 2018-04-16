@@ -2,27 +2,24 @@ public class Board{
 	// create a board from an n-by-n array of tiles,
 
 	int n;
-	int[][] tiles;
-	int[][] goalBoard;
+	int[] tiles;
+	int[] goalBoard;
 
     public Board(int[][] tiles){
 		n = tiles.length;
-		this.tiles = new int[n][n];
-		for (int i = 0; i < n; i++)
-			for (int j = 0; j < n; j++)
-				this.tiles[i][j] = tiles[i][j];
-			
-    }          
+		int max = n * n;
+		this.tiles = new int[max];
+		for (int i = 0; i < max; i++)
+			this.tiles[i] = tiles[i / n][i % n];
+	}          
 
     public void doTheGoalBoard(){
-    	goalBoard = new int[n][n];
-    	int realIndex = 0;
-    	for (int i = 0; i < size(); i++)
-    		for (int j = 0; j < size(); j++)
-    			goalBoard[i][j] = ++realIndex;
+    	int max = n * n;
+    	goalBoard = new int[max];
+    	for (int i = 0; i < max; i++)
+    		goalBoard[i] = i + 1;
 
-    	goalBoard[n-1][n-1] = 0;
-    		
+    	goalBoard[max-1] = 0;
     }
 
     // string representation of this board
@@ -51,7 +48,7 @@ public class Board{
     	if (row > n - 1 || row < 0 || col > n - 1 || row < 0)
     		throw new java.lang.IllegalArgumentException();
 
-    	return tiles[row][col];
+    	return tiles[row * n + col];
     } 
 
     // board size n
@@ -98,11 +95,16 @@ public class Board{
     	return true;
     }          
 
-    public boolean equals(Board x){
+    public boolean isEqual(Board x){
+    	System.out.printf("" + x.size());
     	for (int i = 0; i < size(); i++)
     		for (int j = 0; j < size(); j++)
     			if (tileAt(i,j) != x.tileAt(i,j))
     				return false;
+    	return true;
+    }
+
+    public boolean equals(Object x){
     	return true;
     }
 
@@ -122,15 +124,23 @@ public class Board{
 	        if (i < 0 || i > size() - 1 || j > size() - 1 || j < 0)
 	            items[k] = null;
 	        else{
-	            Board x = new Board(tiles);
-	            x.tiles[blank[0]][blank[1]] = tiles[i][j];
-	            x.tiles[i][j] = 0;
+	            Board x = new Board(matrixBoard(tiles));
+	            x.tiles[blank[0] * size() + blank[1]] = tileAt(i, j);
+	            x.tiles[i * n + j] = 0;
 	            items[k] = x;
 	        }
 	    }
 	    Iterable<Board> result = java.util.Arrays.asList(items);
 	    return result;
     }     
+
+    public int[][] matrixBoard(int[] vector){
+    	int length = vector.length;
+    	int[][] til = new int[length][length];
+    	for (int i = 0; i < length; i++)
+    		til[i / length][i % length] = vector[i];
+    	return til;    		
+    }
 
     // is this board solvable?
     public boolean isSolvable(){
